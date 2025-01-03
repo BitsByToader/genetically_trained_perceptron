@@ -4,7 +4,7 @@ from ioptimization_problem import IOptimizationProblem
 
 
 class Chromosome:
-    def __init__(self, no_genes, min_values, max_values):
+    def __init__(self, no_genes: int, min_values, max_values):
         self.no_genes = no_genes
         self.genes = [0.0] * no_genes
         self.min_values = list(min_values)
@@ -29,16 +29,19 @@ class Chromosome:
 
 class Selection:
     @staticmethod
-    def tournament(population):
-        return random.choice(population)
+    def tournament(population: [Chromosome], k: int) -> Chromosome:
+        members = []
+        for i in range(0,k):
+            members.append(random.choice(population))
+        return max(members, key=lambda c: c.fitness)
 
     @staticmethod
-    def get_best(population):
+    def get_best(population: [Chromosome]) -> Chromosome:
         return max(population, key=lambda c: c.fitness)
 
 class Crossover:
     @staticmethod
-    def arithmetic(mother, father, rate):
+    def point(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
         if random.random() < rate:
             child = Chromosome(mother.no_genes, mother.min_values, mother.max_values)
             idx = random.randint(0, mother.no_genes-1)
@@ -51,18 +54,31 @@ class Crossover:
         else:
             return father
 
+    def arithmetic(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
+        if random.random() < rate:
+            child.copy_from(mother)
+            a = random.random()
+            for i in range(child.no_genes):
+                child.genes[i] = a * mother.genes[i] + (1.0-a) * father.genes[i]
+
+            return child
+        else:
+            return father
+
 class Mutation:
     @staticmethod
-    def reset(child, rate):
+    def reset(child: Chromosome, rate: float):
         if random.random() < rate:
             gene_idx = random.randint(0, child.no_genes-1)
             child.genes[gene_idx] = child.min_values[gene_idx] + random.random() * (child.max_values[gene_idx] - child.min_values[gene_idx])
 
 
 class EvolutionaryAlgorithm:
-    def solve(self, problem, population_size, max_generations, crossover_rate, mutation_rate):
-
+    def solve(self, problem: IOptimizationProblem, population_size: int, max_generations: int, crossover_rate: float, mutation_rate: float) -> Chromosome:
+        # Create random population of given size
         population = [problem.make_chromosome() for _ in range(population_size)]
+        
+        # Initialize population for algorithm
         for individual in population:
             problem.compute_fitness(individual)
 
@@ -71,11 +87,11 @@ class EvolutionaryAlgorithm:
 
             for i in range(1, population_size):
                 # Select parents for crossing.
-                p1 = Selection.tournament(population)
-                p2 = Selection.tournament(population)
+                p1 = Selection.tournament(population, 2)
+                p2 = Selection.tournament(population, 2)
 
                 # Generate child from parents
-                c = Crossover.arithmetic(p1, p2, crossover_rate)
+                c = Crossover.point(p1, p2, crossover_rate)
 
                 # Mutate child
                 Mutation.reset(c, mutation_rate)
