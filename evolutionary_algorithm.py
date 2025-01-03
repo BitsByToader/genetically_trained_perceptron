@@ -1,40 +1,6 @@
 import random
 import math
-
-# Interface for optimization problems
-class IOptimizationProblem:
-    def compute_fitness(self, chromosome):
-        raise NotImplementedError("This method needs to be implemented by a subclass")
-
-    def make_chromosome(self):
-        raise NotImplementedError("This method needs to be implemented by a subclass")
-
-
-class Equation(IOptimizationProblem):
-    def make_chromosome(self):
-        # un cromozom are o gena (x) care poate lua valori in intervalul (-5, 5)
-        return Chromosome(1, [-5], [5])
-
-    def compute_fitness(self, chromosome):
-        gene = chromosome.genes[0]
-        chromosome.fitness = -(abs(gene**5-5*gene+5))
-
-
-class Fence(IOptimizationProblem):
-    def make_chromosome(self):
-        # un cromozom are doua gene (x si y) care pot lua valori in intervalul (0, 100)
-        return Chromosome(2, [0, 0], [100, 100])
-
-    def compute_fitness(self, chromosome):
-        x = chromosome.genes[0]
-        y = chromosome.genes[1]
-        
-        if 2*x + y > 100.0:
-            r = 100.0 / (2*x + y)
-            x = x * r
-            y = y * r
-
-        chromosome.fitness = x * y
+from ioptimization_problem import IOptimizationProblem
 
 
 class Chromosome:
@@ -104,33 +70,22 @@ class EvolutionaryAlgorithm:
             new_population = [Selection.get_best(population)]
 
             for i in range(1, population_size):
-                # selectare 2 parinti: Selection.tournament
+                # Select parents for crossing.
                 p1 = Selection.tournament(population)
                 p2 = Selection.tournament(population)
 
-                # generarea unui copil prin aplicare crossover: Crossover.arithmetic
+                # Generate child from parents
                 c = Crossover.arithmetic(p1, p2, crossover_rate)
 
-                # aplicare mutatie asupra copilului: Mutation.reset
+                # Mutate child
                 Mutation.reset(c, mutation_rate)
 
-                # calculare fitness pentru copil: compute_fitness din problema p
+                # Compute fitness of new child.
                 problem.compute_fitness(c)
 
-                # introducere copil in new_population
+                # Add child to next generation population
                 new_population.append(c)
 
             population = new_population
 
         return Selection.get_best(population)
-
-
-if __name__ == "__main__":
-    ea = EvolutionaryAlgorithm()
-
-    solution = ea.solve(Equation(), 50, 1000, 0.9, 0.1)  # de completat parametrii algoritmului
-    # se foloseste -solution.Fitness pentru ca algoritmul evolutiv maximizeaza, iar aici avem o problema de minimizare
-    print(f"{solution.genes[0]:.6f} -> {-solution.fitness:.6f}")
-          
-    solution = ea.solve(Fence(), 50, 1000, 0.9, 0.1)  # de completat parametrii algoritmului
-    print(f"{solution.genes[0]:.2f} {solution.genes[1]:.2f} -> {solution.fitness:.4f}")
