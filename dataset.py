@@ -21,23 +21,29 @@ class Dataset:
 
 
     # Constructs a dataset based on a given file found at dataset_path.
-    def __init__(self, dataset_path: str):
-        self.__init__()
-        self.dataset_path = dataset_path
-        self.process_dataset_file()
+    @staticmethod
+    def from_file(dataset_path: str):
+        cls = Dataset()
+        cls.dataset_path = dataset_path
+        cls.process_dataset_file()
+        return cls
 
     # Processes the dataset file found at dataset_path.
     def process_dataset_file(self):
         dataset_file = open(self.dataset_path)
         
-        dataset_structure_str = dataset_file.readLine()
-        dataset_structure = dataset_structure_str.decode("utf-8").split(',')
+        dataset_structure_str = dataset_file.readline()
+        dataset_structure = dataset_structure_str.split(',')
         self.input_count = int(dataset_structure[0])
         self.output_count = int(dataset_structure[1])
 
         for vector_str in dataset_file:
-            input_output_str_list = vector_str.decode("utf-8").split(',')
-            
+            # Dataset line beginning with # is a comment.
+            if len(vector_str) == 0 or vector_str[0] == '#':
+                continue
+
+            input_output_str_list = vector_str.split(',')
+
             if len(input_output_str_list) != (self.input_count + self.output_count):
                 raise Exception('Number of values doesnt match for training vector!')
             
@@ -48,7 +54,7 @@ class Dataset:
             dataset_vector = [input_list, output_list]
             self.dataset_vectors.append(dataset_vector)
 
-        f.close()
+        dataset_file.close()
 
     # Given a rate of evaluation vectors to training vectors, shuffles the dataset and splits it into a list
     # of training vectors and a list of evaluation vectors.
