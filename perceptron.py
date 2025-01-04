@@ -6,47 +6,47 @@ class Perceptron:
         self.input_count: int = 0
         self.output_count: int = 0
         self.hidden_layers_count: int = 0
-        self.neutrons_per_layer: [int] = []
+        self.neurons_per_hidden_layer: [int] = []
         self.output_data: [float] = []
         self.weights: [[[float]]]= []
         self.theta: [[float]] = []
 
     # Constructs a perceptron with given information
     @staticmethod
-    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neutrons_per_layer: list):
+    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int]):
         perceptron = Perceptron()
         perceptron.input_count = input_count
         perceptron.output_count = output_count
         perceptron.hidden_layers_count = hidden_layers_count
-        perceptron.neutrons_per_layer = neutrons_per_layer
+        perceptron.neurons_per_hidden_layer = neurons_per_hidden_layer
         
         perceptron.weight_initialization()
         perceptron.theta_initialization()
         return perceptron
     
     @staticmethod
-    def from_file(weights: [[[float]]]):
+    def from_weights(weights: [[[float]]]):
         perceptron = Perceptron()
         perceptron.weights = weights
 
     # Initialize weights according to the available data
     def weight_initialization(self):
-        layers = [self.input_count] + self.neutrons_per_layer + [self.output_count]
-        print("nr neurons per layer: ",layers)
+        neuron_per_layers = [self.input_count] + self.neurons_per_hidden_layer + [self.output_count]
+        print("nr neurons per layer: ",neuron_per_layers)
 
-        for i in range(1,len(layers)):
+        for i in range(1,len(neuron_per_layers)):
             a = []
-            for j in range(layers[i]):
-                b = [0.0] * layers[i - 1]
+            for j in range(neuron_per_layers[i]):
+                b = [0.0] * neuron_per_layers[i - 1]
                 a.append(b)
             self.weights.append(a)
     
     # Initialize theta according to the available data
     def theta_initialization(self):
-        layers = [self.input_count] + self.neutrons_per_layer + [self.output_count]
+        neuron_per_layers = [self.input_count] + self.neurons_per_hidden_layer + [self.output_count]
 
-        for i in range(1,len(layers)):
-            b = [0.0] * layers[i]
+        for i in range(1,len(neuron_per_layers)):
+            b = [0.0] * neuron_per_layers[i]
             self.theta.append(b)
 
     # Given an input the perceptron calculates the output
@@ -82,9 +82,3 @@ class Perceptron:
         mean_error /= len(err)
         print("Mean error: ",mean_error)
     
-if __name__ == '__main__':
-    perceptron = Perceptron.from_counts(5, 4, 3, [3, 2, 3])
-    print("weights: ",perceptron.weights)
-    print("theta: ",perceptron.theta)
-    perceptron.compute_output([1, 1, 1, 1, 1])
-    perceptron.compute_error([0, 0, 0, 0])
