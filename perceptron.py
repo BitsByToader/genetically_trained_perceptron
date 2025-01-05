@@ -50,9 +50,11 @@ class Perceptron:
             self.theta.append(b)
 
     # Given an input the perceptron calculates the output
-    def compute_output(self, input: list):
-        actual_output = input
+    def compute_output(self, input: [float]):
+        if (len(input) != self.input_count):
+            raise Exception("Input length doesn't match input_count")
         
+        actual_output = input
         for layer in range(len(self.weights)):
             inner_input = [1.0] * len(self.weights[layer])
             for i in range(len(self.weights[layer])):    
@@ -66,6 +68,7 @@ class Perceptron:
 
         self.output_data = actual_output
         print("Actual output: ",self.output_data)
+    
 
     # Bipolar sigmoid activation function
     @staticmethod
@@ -73,7 +76,10 @@ class Perceptron:
         return (1 - math.exp(-2*x))/(1 + math.exp(-2*x))
     
     # Calculates the mean square error
-    def compute_error(self, desired_output: list):
+    def compute_error(self, desired_output: [float]):
+        if (len(desired_output) != self.output_count):
+            raise Exception("Desired_output doesn't match output_count")
+        
         err = [0.0] * self.output_count 
         mean_error = 0.0
         for i in range(self.output_count):
@@ -81,4 +87,3 @@ class Perceptron:
             mean_error += err[i]
         mean_error /= len(err)
         print("Mean error: ",mean_error)
-    
