@@ -49,6 +49,21 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         self.perceptron.weights = weights
         self.perceptron.theta = theta
 
+    def evaluate_solution(self, solution: Chromosome) -> float:
+        error: float = 0.0
+
+        self.apply_chromosome_to_perceptron(solution)
+
+        for vector in self.dataset.evaluation_vectors:
+            input_data: [float] = vector[0]
+            output_data: [float] = vector[1]
+
+            self.perceptron.compute_output(input_data)
+            error += self.perceptron.compute_error(output_data)
+
+        error = error / len(self.dataset.evaluation_vectors)
+        return error
+
     def compute_fitness(self, chromosome: Chromosome):
         error: float = 0.0
 
@@ -63,7 +78,10 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
             error += self.perceptron.compute_error(output_data)
 
         error = error / len(self.dataset.training_vectors)
-        chromosome.fitness = -error # TODO: -error?
+        # Negate the error because the algorithm maximizes the fitness, whereas we want to minimize the error.
+        chromosome.fitness = -error
+
+        print(f'Computed fitness for a chromosome: {chromosome.fitness}')
 
     def make_chromosome(self) -> Chromosome:
         return Chromosome(self.gene_count, [-1] * self.gene_count, [1] * self.gene_count)

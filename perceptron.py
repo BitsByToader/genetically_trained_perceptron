@@ -75,7 +75,7 @@ class Perceptron:
     
     # Calculates the mean square error
     def compute_error(self, desired_output: list) -> float:
-        err = [0.0] * self.output_count 
+        err = [0.0] * self.output_count
         mean_error = 0.0
         
         for i in range(self.output_count):

@@ -64,6 +64,7 @@ class EvolutionaryAlgorithm:
             problem.compute_fitness(individual)
 
         for gen in range(max_generations):
+            print(f'Begin generation {gen}')
             new_population = [Selection.get_best(population)]
 
             for i in range(1, population_size):
@@ -83,6 +84,8 @@ class EvolutionaryAlgorithm:
                 # Add child to next generation population
                 new_population.append(c)
 
+            # TODO: Compute overall fitness of all the population and print it.
+            # Will be useful for plotting the performance of the algorithm.
             population = new_population
 
         return Selection.get_best(population)
