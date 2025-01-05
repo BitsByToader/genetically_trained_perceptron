@@ -8,7 +8,7 @@ class Perceptron:
         self.hidden_layers_count: int = 0
         self.neurons_per_hidden_layer: [int] = []
         self.output_data: [float] = []
-        self.weights: [[[float]]]= []
+        self.weights: [[[float]]] = []
         self.theta: [[float]] = []
 
     # Constructs a perceptron with given information
@@ -27,6 +27,7 @@ class Perceptron:
     @staticmethod
     def from_weights(weights: [[[float]]]):
         perceptron = Perceptron()
+        # TODO: also initialize counts
         perceptron.weights = weights
 
     # Initialize weights according to the available data

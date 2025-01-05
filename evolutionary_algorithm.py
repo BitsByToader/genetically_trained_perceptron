@@ -68,7 +68,7 @@ class EvolutionaryAlgorithm:
                 p2 = Selection.tournament(population, 2)
 
                 # Generate child from parents
-                c = Crossover.point(p1, p2, crossover_rate)
+                c = Crossover.arithmetic(p1, p2, crossover_rate)
 
                 # Mutate child
                 Mutation.reset(c, mutation_rate)
