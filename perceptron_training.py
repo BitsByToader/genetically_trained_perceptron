@@ -6,7 +6,9 @@ from perceptron import Perceptron
 class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
     def __init__(self, dataset_path: str, hidden_layer_counts: [int]):
         self.dataset: Dataset = Dataset.from_file(dataset_path)
+        self.dataset.split_dataset_vectors(0.75)
         self.perceptron: Perceptron = Perceptron.from_counts(self.dataset.input_count, self.dataset.output_count, len(hidden_layer_counts), hidden_layer_counts)
+        self.gene_count = len(self.perceptron_weights_to_chromosome_genes())
     
     def perceptron_weights_to_chromosome_genes(self) -> [float]:
         weights = self.perceptron.weights
@@ -19,10 +21,11 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         ]
         return flattened
 
-    def chromosome_genes_to_perceptron_weights(self, genes: [float]):
+    def apply_chromosome_to_perceptron(self, chromosome: Chromosome):
         weights: [[[float]]] = []
         theta: [[float]] = []
-        
+        genes = list(chromosome.genes)
+
         neuron_count_per_layer = [self.perceptron.input_count] + self.perceptron.neurons_per_hidden_layer + [self.perceptron.output_count]
         for idx in range(1, len(neuron_count_per_layer)):
             curr_layer_neuron_count = neuron_count_per_layer[idx]
@@ -47,8 +50,20 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         self.perceptron.theta = theta
 
     def compute_fitness(self, chromosome: Chromosome):
-        raise NotImplementedError("This method needs to be implemented by a subclass")
+        error: float = 0.0
+
+        # Apply chromosome genes to perceptron to compute error.
+        self.apply_chromosome_to_perceptron(chromosome)
+
+        for vector in self.dataset.training_vectors:
+            input_data: [float] = vector[0]
+            output_data: [float] = vector[1]
+
+            self.perceptron.compute_output(input_data)
+            error += self.perceptron.compute_error(output_data)
+
+        error = error / len(self.dataset.training_vectors)
+        chromosome.fitness = -error # TODO: -error?
 
     def make_chromosome(self) -> Chromosome:
-        gene_count = len(self.perceptron_weights_to_chromosome_genes())
-        return Chromosome(gene_count, [-2**31] * gene_count, [2**31-1] * gene_count)
+        return Chromosome(self.gene_count, [-1] * self.gene_count, [1] * self.gene_count)

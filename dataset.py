@@ -13,12 +13,11 @@ class Dataset:
         #   1. list of input data;
         #   2. list of corresponding output data.
         # The two lists will only contain floats.
-        self.dataset_vectors: [[float]] = []
+        self.dataset_vectors: [[[float]]] = []
 
         # Same as above
-        self.training_vectors: [[float]] = []
-        self.evaluation_vectors: [[float]] = []
-
+        self.training_vectors: [[[float]]] = []
+        self.evaluation_vectors: [[[float]]] = []
 
     # Constructs a dataset based on a given file found at dataset_path.
     @staticmethod

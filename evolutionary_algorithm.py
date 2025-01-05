@@ -21,6 +21,8 @@ class Crossover:
     def point(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
         if random.random() < rate:
             child = Chromosome(mother.no_genes, mother.min_values, mother.max_values)
+            child.copy_from(mother)
+            
             idx = random.randint(0, mother.no_genes-1)
             for i in range(0, idx):
                 child.genes[i] = mother.genes[i]
@@ -33,7 +35,9 @@ class Crossover:
 
     def arithmetic(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
         if random.random() < rate:
+            child = Chromosome(mother.no_genes, mother.min_values, mother.max_values)
             child.copy_from(mother)
+            
             a = random.random()
             for i in range(child.no_genes):
                 child.genes[i] = a * mother.genes[i] + (1.0-a) * father.genes[i]
