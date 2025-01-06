@@ -11,7 +11,7 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         self.gene_count = len(self.perceptron_weights_to_chromosome_genes())
     
     def perceptron_weights_to_chromosome_genes(self) -> [float]:
-        weights = self.perceptron.weights
+        weights = self.perceptron.weights.copy()
         weights.append(self.perceptron.theta)
         flattened = [
             w
@@ -81,7 +81,7 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         # Negate the error because the algorithm maximizes the fitness, whereas we want to minimize the error.
         chromosome.fitness = -error
 
-        print(f'Computed fitness for a chromosome: {chromosome.fitness}')
+        # print(f'Computed fitness for a chromosome: {chromosome.fitness}')
 
     def make_chromosome(self) -> Chromosome:
         return Chromosome(self.gene_count, [-1] * self.gene_count, [1] * self.gene_count)

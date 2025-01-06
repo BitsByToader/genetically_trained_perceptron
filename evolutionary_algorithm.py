@@ -21,7 +21,6 @@ class Crossover:
     def point(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
         if random.random() < rate:
             child = Chromosome(mother.no_genes, mother.min_values, mother.max_values)
-            child.copy_from(mother)
             
             idx = random.randint(0, mother.no_genes-1)
             for i in range(0, idx):
@@ -36,7 +35,6 @@ class Crossover:
     def arithmetic(mother: Chromosome, father: Chromosome, rate: float) -> Chromosome:
         if random.random() < rate:
             child = Chromosome(mother.no_genes, mother.min_values, mother.max_values)
-            child.copy_from(mother)
             
             a = random.random()
             for i in range(child.no_genes):
@@ -67,6 +65,8 @@ class EvolutionaryAlgorithm:
             print(f'Begin generation {gen}')
             new_population = [Selection.get_best(population)]
 
+            mean_fitness: float = 0.0
+
             for i in range(1, population_size):
                 # Select parents for crossing.
                 p1 = Selection.tournament(population, 2)
@@ -80,12 +80,16 @@ class EvolutionaryAlgorithm:
 
                 # Compute fitness of new child.
                 problem.compute_fitness(c)
+                mean_fitness += c.fitness
 
                 # Add child to next generation population
                 new_population.append(c)
 
-            # TODO: Compute overall fitness of all the population and print it.
-            # Will be useful for plotting the performance of the algorithm.
             population = new_population
+
+            # TODO: Add mean fitness to a report and return at the end of the training.
+            # Optionally remove printing.
+            mean_fitness /= population_size
+            print(f'Generation {gen} had mean fitness of: {mean_fitness}')
 
         return Selection.get_best(population)
