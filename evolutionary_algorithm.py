@@ -91,6 +91,6 @@ class EvolutionaryAlgorithm:
             mean_fitness /= population_size
             mean_fitness_report.append(mean_fitness)
 
-            # print(f'Generation {gen} had mean fitness of: {mean_fitness}')
+            print(f'Generation {gen} had mean fitness of: {mean_fitness}')
         
         return Selection.get_best(population), mean_fitness_report

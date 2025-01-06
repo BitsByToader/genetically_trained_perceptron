@@ -1,4 +1,5 @@
 import math 
+import numpy as np
 
 class Perceptron:
     # Constructs an empty perceptron
@@ -61,7 +62,7 @@ class Perceptron:
         if (len(input) != self.input_count):
             raise Exception("Input length doesn't match input_count")
         
-        actual_output = input
+        actual_output = input.copy()
         for layer in range(len(self.weights)):
             inner_input = [1.0] * len(self.weights[layer])
             for i in range(len(self.weights[layer])):    
@@ -71,15 +72,21 @@ class Perceptron:
                 inner_input[i] -= self.theta[layer][i]
                 inner_input[i] = self.sigmoid_activation(inner_input[i]) # Activation function
             
-            actual_output = inner_input
+            actual_output = inner_input.copy()
 
-        self.output_data = actual_output
+        self.output_data = actual_output.copy()
 
     # Bipolar sigmoid activation function
     @staticmethod
-    def sigmoid_activation(x: float):
+    def sigmoid_activation(x: float) -> float: # TODO: Change to name to bipolar_sigmoid_activation
         return (1 - math.exp(-2*x))/(1 + math.exp(-2*x))
-    
+
+    @staticmethod
+    def stable_sigmoid(x: float) -> float:
+        # TODO: replace with standard library implementation
+        return np.where(x >= 0, 1 / (1 + np.exp(-x)), np.exp(x) / (1 + np.exp(x)))
+
+
     # Calculates the mean square error
     def compute_error(self, desired_output: [float]):
         if (len(desired_output) != self.output_count):

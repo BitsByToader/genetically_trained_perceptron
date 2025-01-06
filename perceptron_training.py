@@ -6,7 +6,7 @@ from perceptron import Perceptron
 class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
     def __init__(self, dataset_path: str, hidden_layer_counts: [int]):
         self.dataset: Dataset = Dataset.from_file(dataset_path)
-        self.dataset.split_dataset_vectors(0.75)
+        self.dataset.split_dataset_vectors(1) # TODO: Change me!
         self.perceptron: Perceptron = Perceptron.from_counts(self.dataset.input_count, self.dataset.output_count, len(hidden_layer_counts), hidden_layer_counts)
         self.gene_count = len(self.perceptron_weights_to_chromosome_genes())
     
