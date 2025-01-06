@@ -1,3 +1,6 @@
+import random
+
+
 # Chromosome objects are the optimisation target of an Optimization Problem.
 class Chromosome:
     def __init__(self, no_genes: int, min_values, max_values):

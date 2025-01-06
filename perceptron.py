@@ -8,12 +8,12 @@ class Perceptron:
         self.hidden_layers_count: int = 0
         self.neurons_per_hidden_layer: [int] = []
         self.output_data: [float] = []
-        self.weights: [[[float]]]= []
+        self.weights: [[[float]]] = []
         self.theta: [[float]] = []
 
     # Constructs a perceptron with given information
     @staticmethod
-    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int]):
+    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int]): # TODO: mark return type
         perceptron = Perceptron()
         perceptron.input_count = input_count
         perceptron.output_count = output_count
@@ -25,9 +25,11 @@ class Perceptron:
         return perceptron
     
     @staticmethod
-    def from_weights(weights: [[[float]]]):
+    def from_weights(weights: [[[float]]]): # TODO: mark return type
         perceptron = Perceptron()
+        # TODO: also initialize counts
         perceptron.weights = weights
+        # TODO: return perceptron
 
     # Initialize weights according to the available data
     def weight_initialization(self):
@@ -67,8 +69,6 @@ class Perceptron:
             actual_output = inner_input
 
         self.output_data = actual_output
-        print("Actual output: ",self.output_data)
-    
 
     # Bipolar sigmoid activation function
     @staticmethod
@@ -82,8 +82,10 @@ class Perceptron:
         
         err = [0.0] * self.output_count 
         mean_error = 0.0
+        
         for i in range(self.output_count):
             err[i] = (desired_output[i] - self.output_data[i]) * (desired_output[i] - self.output_data[i])
             mean_error += err[i]
+        
         mean_error /= len(err)
-        print("Mean error: ",mean_error)
+        return mean_error
