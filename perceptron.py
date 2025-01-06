@@ -13,7 +13,7 @@ class Perceptron:
 
     # Constructs a perceptron with given information
     @staticmethod
-    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int]): # TODO: mark return type
+    def from_counts(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int]) -> 'Perceptron':
         perceptron = Perceptron()
         perceptron.input_count = input_count
         perceptron.output_count = output_count
@@ -25,11 +25,16 @@ class Perceptron:
         return perceptron
     
     @staticmethod
-    def from_weights(weights: [[[float]]]): # TODO: mark return type
+    def from_weights(input_count: int, output_count: int, hidden_layers_count: int, neurons_per_hidden_layer: [int], weights: [[[float]]], theta: [[float]]) -> 'Perceptron':
         perceptron = Perceptron()
-        # TODO: also initialize counts
+        perceptron.input_count = input_count
+        perceptron.output_count = output_count
+        perceptron.hidden_layers_count = hidden_layers_count
+        perceptron.neurons_per_hidden_layer = neurons_per_hidden_layer
+
         perceptron.weights = weights
-        # TODO: return perceptron
+        perceptron.theta = theta
+        return perceptron
 
     # Initialize weights according to the available data
     def weight_initialization(self):

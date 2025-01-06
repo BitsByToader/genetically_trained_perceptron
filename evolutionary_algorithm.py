@@ -53,16 +53,17 @@ class Mutation:
 
 
 class EvolutionaryAlgorithm:
-    def solve(self, problem: IOptimizationProblem, population_size: int, max_generations: int, crossover_rate: float, mutation_rate: float) -> Chromosome:
+    def solve(self, problem: IOptimizationProblem, population_size: int, max_generations: int, crossover_rate: float, mutation_rate: float) -> (Chromosome, [float]) :
         # Create random population of given size
         population = [problem.make_chromosome() for _ in range(population_size)]
-        
+        mean_fitness_report : [float] = []
+
         # Initialize population for algorithm
         for individual in population:
             problem.compute_fitness(individual)
 
         for gen in range(max_generations):
-            print(f'Begin generation {gen}')
+            # print(f'Begin generation {gen}')
             new_population = [Selection.get_best(population)]
 
             mean_fitness: float = 0.0
@@ -87,9 +88,9 @@ class EvolutionaryAlgorithm:
 
             population = new_population
 
-            # TODO: Add mean fitness to a report and return at the end of the training.
-            # Optionally remove printing.
             mean_fitness /= population_size
-            print(f'Generation {gen} had mean fitness of: {mean_fitness}')
+            mean_fitness_report.append(mean_fitness)
 
-        return Selection.get_best(population)
+            # print(f'Generation {gen} had mean fitness of: {mean_fitness}')
+        
+        return Selection.get_best(population), mean_fitness_report
