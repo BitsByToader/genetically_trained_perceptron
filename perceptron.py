@@ -1,5 +1,4 @@
 import math 
-import numpy as np
 
 class Perceptron:
     # Constructs an empty perceptron
@@ -57,47 +56,86 @@ class Perceptron:
             b = [0.0] * neuron_per_layers[i]
             self.theta.append(b)
 
+    # Bipolar sigmoid activation function
+    @staticmethod
+    def bipolar_sigmoid_activation(x: float) -> float:
+        # Bind input as to not overflow (TODO: correct?)
+        # if x >= 30.0:
+        #     x = 30.0
+        
+        # if x <= -30.0:
+        #     x = -30.0
+        
+        # Compute bipolar sigmoid
+        return (1.0 - math.exp(-2*x))/(1.0 + math.exp(-2*x))
+
+    # Numerically stable sigmoid activation function
+    @staticmethod
+    def stable_sigmoid_activation(x: float) -> float:
+        if x >= 0:
+            return 1. / ( 1. + math.exp(-x) )
+        else:
+            return math.exp(x) / ( 1. + math.exp(x) )
+
+    # Step activation function
+    @staticmethod
+    def step_activation(x: float) -> float:
+        return (1.0 if x >= 0 else 0.0)
+
+    # Rectified Linear Unit activation function
+    @staticmethod
+    def relu_activation(x: float) -> float:
+        return (x if x > 0 else 0.0)
+
+    @staticmethod
+    def softmax(inputs: [float]) -> [float]:
+        # TODO: Subtract highest value from all values if overflow happens.
+        # Or normalize based on highest value?
+        inputs_exp: [float] = [math.exp(x) for x in inputs ]
+        inputs_sum: float = math.fsum(inputs_exp)
+        return [x / inputs_sum for x in inputs_exp]
+
     # Given an input the perceptron calculates the output
     def compute_output(self, input: [float]):
         if (len(input) != self.input_count):
             raise Exception("Input length doesn't match input_count")
         
-        actual_output = input.copy()
+        previous_layer = input.copy()
         for layer in range(len(self.weights)):
-            inner_input = [1.0] * len(self.weights[layer])
-            for i in range(len(self.weights[layer])):    
-                for j in range(len(self.weights[layer][i])):
-                    inner_input[i] *= actual_output[j] * self.weights[layer][i][j]
+            neuron_values = [1.0] * len(self.weights[layer])
+            for neuron_idx in range(len(self.weights[layer])):
+                for neuron_input_idx in range(len(self.weights[layer][neuron_idx])):
+                    neuron_values[neuron_idx] += previous_layer[neuron_input_idx] * self.weights[layer][neuron_idx][neuron_input_idx]
                 
-                inner_input[i] -= self.theta[layer][i]
-                inner_input[i] = self.sigmoid_activation(inner_input[i]) # Activation function
+                neuron_values[neuron_idx] -= self.theta[layer][neuron_idx]
+                if layer < len(self.weights)-1:
+                    # Apply regular activation function to all layers besides output.
+                    # Output will use softmax function as 'activation' function.
+                    neuron_values[neuron_idx] = self.relu_activation(neuron_values[neuron_idx])
             
-            actual_output = inner_input.copy()
+            previous_layer = neuron_values.copy()
 
-        self.output_data = actual_output.copy()
-
-    # Bipolar sigmoid activation function
-    @staticmethod
-    def sigmoid_activation(x: float) -> float: # TODO: Change to name to bipolar_sigmoid_activation
-        return (1 - math.exp(-2*x))/(1 + math.exp(-2*x))
-
-    @staticmethod
-    def stable_sigmoid(x: float) -> float:
-        # TODO: replace with standard library implementation
-        return np.where(x >= 0, 1 / (1 + np.exp(-x)), np.exp(x) / (1 + np.exp(x)))
-
+        self.output_data = self.softmax(previous_layer)
 
     # Calculates the mean square error
-    def compute_error(self, desired_output: [float]):
-        if (len(desired_output) != self.output_count):
-            raise Exception("Desired_output doesn't match output_count")
+    # def compute_error(self, desired_output: [float]) -> float:
+    #     if (len(desired_output) != self.output_count):
+    #         raise Exception("Desired_output doesn't match output_count")
         
-        err = [0.0] * self.output_count 
-        mean_error = 0.0
+    #     err = [0.0] * self.output_count 
+    #     mean_error = 0.0
         
-        for i in range(self.output_count):
-            err[i] = (desired_output[i] - self.output_data[i]) * (desired_output[i] - self.output_data[i])
-            mean_error += err[i]
+    #     for i in range(self.output_count):
+    #         err[i] = (desired_output[i] - self.output_data[i]) * (desired_output[i] - self.output_data[i])
+    #         mean_error += err[i]
         
-        mean_error /= len(err)
-        return mean_error
+    #     mean_error /= len(err)
+    #     return mean_error
+
+    # Calculates the categorical loss entropy of the computed output data and the expected class.
+    # The method expects that the desired and computed output have the classes encoded as one-hot.
+    def compute_error(self, desired_output: [float]) -> float:
+        epsilon = 1e-7  # Small value to avoid log(0)
+        predicted_probs = [max(p, epsilon) for p in self.output_data]  # Ensure no zero probabilities
+        loss = -sum(t * math.log(p) for t, p in zip(desired_output, self.output_data))
+        return loss
