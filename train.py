@@ -1,15 +1,19 @@
 from perceptron_training import PerceptronTrainingOptimizationProblem
 from evolutionary_algorithm import EvolutionaryAlgorithm
+import random
 
-# TODO: Improve printing
-
-if __name__ == '__main__':
+if __name__ == '__main__':    
     training_algorithm = EvolutionaryAlgorithm()
-    training_problem = PerceptronTrainingOptimizationProblem("/Users/tudor/Documents/proiect_ia/data_sets/iris/iris_dataset.txt", [2, 5, 3])
-
-    winning_chromosome = training_algorithm.solve(training_problem, 100, 10000, 0.9, 0.1)
+    training_problem = PerceptronTrainingOptimizationProblem("iris_dataset.txt", [10,10])
+    
+    winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 30, 1000, 0.9, 0.1)
     print(f'Mean error over training set: {-winning_chromosome.fitness}')
     print(f'Mean error over evaluation set: {training_problem.evaluate_solution(winning_chromosome)}')
+    print(f'Winning chromosome: {winning_chromosome.genes}')
 
-    training_problem.perceptron.compute_output([6.2,2.8,4.8,1.8])
-    print(f'Some output for some input: {training_problem.perceptron.output_data}')
+    for i in range(0,10):
+        eval_vec = random.choice(training_problem.dataset.evaluation_vectors)
+        eval_input = eval_vec[0]
+        eval_output = eval_vec[1]
+        training_problem.perceptron.compute_output(eval_input)
+        print(f'Input: {eval_input}. Expected output: {eval_output}. Computed output: {training_problem.perceptron.output_data}')

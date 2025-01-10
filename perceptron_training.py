@@ -79,9 +79,10 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
 
         error = error / len(self.dataset.training_vectors)
         # Negate the error because the algorithm maximizes the fitness, whereas we want to minimize the error.
+        # TODO: Maybe exponentiate the -error in order to bump up fitness values and promote slight variations.
         chromosome.fitness = -error
 
         # print(f'Computed fitness for a chromosome: {chromosome.fitness}')
 
     def make_chromosome(self) -> Chromosome:
-        return Chromosome(self.gene_count, [-1] * self.gene_count, [1] * self.gene_count)
+        return Chromosome(self.gene_count, [-1.0] * self.gene_count, [1.0] * self.gene_count)
