@@ -4,7 +4,7 @@ import random
 
 if __name__ == '__main__':    
     training_algorithm = EvolutionaryAlgorithm()
-    training_problem = PerceptronTrainingOptimizationProblem("iris_dataset.txt", [10,10])
+    training_problem = PerceptronTrainingOptimizationProblem("breast_dataset.txt", 0.75, [10,10])
     
     winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 30, 1000, 0.9, 0.1)
     print(f'Mean error over training set: {-winning_chromosome.fitness}')

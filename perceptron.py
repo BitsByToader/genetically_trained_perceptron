@@ -89,9 +89,9 @@ class Perceptron:
 
     @staticmethod
     def softmax(inputs: [float]) -> [float]:
-        # TODO: Subtract highest value from all values if overflow happens.
-        # Or normalize based on highest value?
-        inputs_exp: [float] = [math.exp(x) for x in inputs ]
+        max_input = max(inputs)
+        inputs_bounded = [x-max_input for x in inputs]
+        inputs_exp: [float] = [math.exp(x) for x in inputs_bounded ]
         inputs_sum: float = math.fsum(inputs_exp)
         return [x / inputs_sum for x in inputs_exp]
 

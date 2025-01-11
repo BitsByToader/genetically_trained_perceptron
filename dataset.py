@@ -36,6 +36,9 @@ class Dataset:
         self.input_count = int(dataset_structure[0])
         self.output_count = int(dataset_structure[1])
 
+        global_min = 0.1
+        global_max = 1.0
+
         for vector_str in dataset_file:
             # Dataset line beginning with # is a comment.
             if len(vector_str) == 0 or vector_str[0] == '#':
@@ -50,10 +53,22 @@ class Dataset:
             input_list = input_output_list[0:(self.input_count)]
             output_list = input_output_list[(self.input_count):]
 
+            local_min = min(input_list)
+            local_max = max(input_list)
+
+            global_max = local_max if local_max > global_max else global_max
+            global_min = local_min if local_min < global_min else global_min
+
             dataset_vector = [input_list, output_list]
             self.dataset_vectors.append(dataset_vector)
 
         dataset_file.close()
+
+        # Apply min max normalization to dataset
+        divisor = global_max - global_min
+        for vector_idx in range(len(self.dataset_vectors)):
+            for attribute_idx in range(len(self.dataset_vectors[vector_idx][0])):
+                self.dataset_vectors[vector_idx][0][attribute_idx] = (self.dataset_vectors[vector_idx][0][attribute_idx] - global_min) / divisor
 
     # Given a rate of evaluation vectors to training vectors, shuffles the dataset and splits it into a list
     # of training vectors and a list of evaluation vectors.
