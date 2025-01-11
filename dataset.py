@@ -21,14 +21,14 @@ class Dataset:
 
     # Constructs a dataset based on a given file found at dataset_path.
     @staticmethod
-    def from_file(dataset_path: str):
+    def from_file(dataset_path: str, normalize_dataset: bool):
         cls = Dataset()
         cls.dataset_path = dataset_path
-        cls.process_dataset_file()
+        cls.process_dataset_file(normalize_dataset)
         return cls
 
     # Processes the dataset file found at dataset_path.
-    def process_dataset_file(self):
+    def process_dataset_file(self, normalize_dataset: bool):
         dataset_file = open(self.dataset_path)
         
         dataset_structure_str = dataset_file.readline()
@@ -53,16 +53,20 @@ class Dataset:
             input_list = input_output_list[0:(self.input_count)]
             output_list = input_output_list[(self.input_count):]
 
-            local_min = min(input_list)
-            local_max = max(input_list)
+            if normalize_dataset == True:
+                local_min = min(input_list)
+                local_max = max(input_list)
 
-            global_max = local_max if local_max > global_max else global_max
-            global_min = local_min if local_min < global_min else global_min
+                global_max = local_max if local_max > global_max else global_max
+                global_min = local_min if local_min < global_min else global_min
 
             dataset_vector = [input_list, output_list]
             self.dataset_vectors.append(dataset_vector)
 
         dataset_file.close()
+
+        if normalize_dataset == False:
+            return
 
         # Apply min max normalization to dataset
         divisor = global_max - global_min
