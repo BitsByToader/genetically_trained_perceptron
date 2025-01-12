@@ -1,4 +1,5 @@
 import tkinter as tk
+from perceptron import Perceptron
 
 GRID_SIZE = 32 # 32*32 square
 CELL_SIZE = 15  
@@ -31,13 +32,45 @@ def clear_grid():
         for cell in row:
             canvas.itemconfig(cell, fill='white')
 
+def get_8x8_matrix()->[int]:
+    reduced_matrix = []
+
+    for i in range(0, GRID_SIZE, 4):  
+        row = []
+        for j in range(0, GRID_SIZE, 4):
+            # counting the number of black(1) pixels
+            nr_black_pixels = 0
+            for x in range(i, i + 4):
+                for y in range(j, j + 4):
+                    current_color = canvas.itemcget(grid[x][y], 'fill')
+                    if current_color == 'black':
+                        nr_black_pixels += 1
+            
+            row.append(nr_black_pixels)
+        reduced_matrix.append(row)
+
+    return reduced_matrix
+
+
 def guess():
     result = "N/A"
     #Todo: add logic here
+    input_matrix = get_8x8_matrix()
+    for i in range(8):
+        for j in range(8):
+            print (input_matrix[i][j],end = " "),
+        print(" ")
+    print("---------------------")
     
+    flat_input = [
+        x
+        for xs in input_matrix
+        for x in xs
+    ]
+
     result_window = tk.Toplevel(root)
     result_window.title("Rezultat")
-    result_label = tk.Label(result_window, text=result, font=("Arial", 24), bg="lightblue", padx=20, pady=20)
+    result_label = tk.Label(result_window, text=result, font=("Arial", 24),  padx=20, pady=20)
     result_label.pack()
 
 
@@ -64,7 +97,7 @@ for i in range(GRID_SIZE):
 
 
 canvas.bind("<Button-1>", toggle_cell)  # Simple click for changing the color
-canvas.bind("<B1-Motion>", draw_continuous)  # moving the mouse for continous drawing
+canvas.bind("<B1-Motion>", draw_continuous)  # Moving the mouse for continous drawing
 
 button_frame = tk.Frame(root)
 button_frame.pack(pady=10)
