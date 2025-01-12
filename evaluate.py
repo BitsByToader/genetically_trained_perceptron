@@ -52,11 +52,15 @@ if __name__ == '__main__':
         vector = dataset.dataset_vectors[i]
         vinput = vector[0]
         voutput = vector[1]
+        expected_class = voutput.index(max(voutput))
 
         perceptron.compute_output(vinput)
         comp_output = perceptron.output_data
+        comp_class = comp_output.index(max(comp_output))
 
         print(f'Input data: {vinput}')
         print(f'Expected output: {voutput}')
         print(f'Computed output: {comp_output}')
+        print(f'Expected class: {expected_class}')
+        print(f'Computed class: {comp_class}')
         print()
