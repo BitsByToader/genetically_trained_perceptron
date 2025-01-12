@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
     # Save winning perceptron to file
     chromosome_file = open("training_output.txt", "wt")
+    # Header describing the structure of the trained perceptron: input_count, output_count and list of neuron count per hidden layers.
+    chromosome_file.write(f'{training_problem.perceptron.input_count},{training_problem.perceptron.output_count},{",".join([str(i) for i in training_problem.perceptron.neurons_per_hidden_layer])}\n')
     chromosome_file.write(','.join([str(f) for f in winning_chromosome.genes]))
     chromosome_file.close()
 
