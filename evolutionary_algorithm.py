@@ -89,7 +89,7 @@ class EvolutionaryAlgorithm:
             population = new_population
 
             mean_fitness /= population_size
-            mean_fitness_report.append(mean_fitness)
+            mean_fitness_report.append(-mean_fitness)
 
             print(f'Generation {gen} had mean fitness of: {mean_fitness}')
         
