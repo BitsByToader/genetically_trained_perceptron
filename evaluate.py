@@ -1,6 +1,7 @@
 from dataset import Dataset
 from perceptron import Perceptron
 
+
 def apply_training_data_to_perceptron(perceptron: Perceptron, training_data: [float]):
     weights: [[[float]]] = []
     theta: [[float]] = []
@@ -29,25 +30,32 @@ def apply_training_data_to_perceptron(perceptron: Perceptron, training_data: [fl
     perceptron.weights = weights
     perceptron.theta = theta
 
-if __name__ == '__main__':
-    dataset = Dataset.from_file("handwriting_dataset.txt", 0)
 
+if __name__ == '__main__':
+    # Process training data from file
     training_data_file = open("training_output.txt", "rt")
     
+    # Read perceptron structure
     header_str = training_data_file.readline()
     header_data = [int(s) for s in header_str.split(',')]
     input_count = header_data[0]
     output_count = header_data[1]
     hidden_layer_counts = header_data[2:]
 
+    # Read perceptron weights
     weights_str = training_data_file.readline()
     weights = [float(s) for s in weights_str.split(',')]
 
     training_data_file.close()
 
+    # Create perceptron and apply weights
     perceptron = Perceptron.from_counts(input_count, output_count, len(hidden_layer_counts), hidden_layer_counts)
     apply_training_data_to_perceptron(perceptron, weights)
 
+    # Open and process dataset.
+    dataset = Dataset.from_file("handwriting_dataset.txt", 0)
+
+    # Evaluate perceptron using dataset
     for i in range(10):
         vector = dataset.dataset_vectors[i]
         vinput = vector[0]

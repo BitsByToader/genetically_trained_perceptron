@@ -7,10 +7,10 @@ import random
 if __name__ == '__main__':
     # Initialize problem
     training_algorithm = EvolutionaryAlgorithm()
-    training_problem = PerceptronTrainingOptimizationProblem("handwriting_dataset.txt", 0.005, False, [50,50])
+    training_problem = PerceptronTrainingOptimizationProblem("handwriting_dataset.txt", 0.01, False, [50,50])
     
     # Train perceptron
-    winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 50, 50, 0.9, 0.1)
+    winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 50, 3000, 0.9, 0.1)
     print(f'Mean error over training set: {-winning_chromosome.fitness}')
     print(f'Mean error over evaluation set: {training_problem.evaluate_solution(winning_chromosome)}')
 
