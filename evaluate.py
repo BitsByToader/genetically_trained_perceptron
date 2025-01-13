@@ -55,9 +55,13 @@ if __name__ == '__main__':
     # Open and process dataset.
     dataset = Dataset.from_file("handwriting_dataset.txt", 0)
 
+    # Evaluation metrics
+    vectors_predicted_ok = 0
+    vectors_predicted_not_ok = 0
+    failed_class_histogram = [0] * output_count
+
     # Evaluate perceptron using dataset
-    for i in range(10):
-        vector = dataset.dataset_vectors[i]
+    for vector in dataset.dataset_vectors:
         vinput = vector[0]
         voutput = vector[1]
         expected_class = voutput.index(max(voutput))
@@ -66,9 +70,20 @@ if __name__ == '__main__':
         comp_output = perceptron.output_data
         comp_class = comp_output.index(max(comp_output))
 
-        print(f'Input data: {vinput}')
-        print(f'Expected output: {voutput}')
-        print(f'Computed output: {comp_output}')
-        print(f'Expected class: {expected_class}')
-        print(f'Computed class: {comp_class}')
-        print()
+        if comp_class == expected_class:
+            vectors_predicted_ok += 1
+        else:
+            vectors_predicted_not_ok += 1
+            failed_class_histogram[expected_class] += 1
+
+            # print('Got a bad match!')
+            # print(f'Input data: {vinput}')
+            # print(f'Expected output: {voutput}')
+            # print(f'Computed output: {comp_output}')
+            # print(f'Expected class: {expected_class}')
+            # print(f'Computed class: {comp_class}')
+            # print()
+
+    print(f'Vectors predicted right: {vectors_predicted_ok}')
+    print(f'Vectors predicted badly: {vectors_predicted_not_ok}')
+    print(f'Histogram of errors by correct classes: {failed_class_histogram}')

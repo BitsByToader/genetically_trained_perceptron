@@ -6,7 +6,7 @@ import random
 import multiprocessing
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(4)
+    pool = multiprocessing.Pool(7)
 
     # Initialize problem
     training_algorithm = EvolutionaryAlgorithm()

@@ -69,7 +69,7 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         self.apply_chromosome_to_perceptron(solution)
 
         for vector in self.dataset.evaluation_vectors:
-            error += self.compute_error(self.perceptron, vector)
+            error += self.compute_error((self.perceptron, vector))
 
         error = error / len(self.dataset.evaluation_vectors)
         return error
