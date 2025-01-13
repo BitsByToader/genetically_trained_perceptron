@@ -3,14 +3,17 @@ from evolutionary_algorithm import EvolutionaryAlgorithm
 
 import matplotlib.pyplot as plt
 import random
+import multiprocessing
 
 if __name__ == '__main__':
+    pool = multiprocessing.Pool(4)
+
     # Initialize problem
     training_algorithm = EvolutionaryAlgorithm()
-    training_problem = PerceptronTrainingOptimizationProblem("handwriting_dataset.txt", 0.01, False, [50,50])
+    training_problem = PerceptronTrainingOptimizationProblem(pool, "handwriting_dataset.txt", 0.1, False, [50,50])
     
     # Train perceptron
-    winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 50, 3000, 0.9, 0.1)
+    winning_chromosome, mean_fitness_report = training_algorithm.solve(training_problem, 50, 5000, 0.9, 0.1)
     print(f'Mean error over training set: {-winning_chromosome.fitness}')
     print(f'Mean error over evaluation set: {training_problem.evaluate_solution(winning_chromosome)}')
 
