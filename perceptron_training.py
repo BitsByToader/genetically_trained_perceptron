@@ -3,8 +3,12 @@ from chromosome import Chromosome
 from dataset import Dataset
 from perceptron import Perceptron
 
+from multiprocessing import Pool
+
 class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
-    def __init__(self, dataset_path: str, dataset_split_rate: float, normalize_dataset: bool, hidden_layer_counts: [int]):
+    def __init__(self, pool: Pool, dataset_path: str, dataset_split_rate: float, normalize_dataset: bool, hidden_layer_counts: [int]):
+        self.pool = pool
+        
         self.dataset: Dataset = Dataset.from_file(dataset_path, normalize_dataset)
         self.dataset.split_dataset_vectors(dataset_split_rate)
         self.perceptron: Perceptron = Perceptron.from_counts(self.dataset.input_count, self.dataset.output_count, len(hidden_layer_counts), hidden_layer_counts)
@@ -49,17 +53,23 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         self.perceptron.weights = weights
         self.perceptron.theta = theta
 
+    @staticmethod
+    def compute_error(args) -> float:
+        perceptron, training_vector = args
+        
+        input_data: [float] = training_vector[0]
+        output_data: [float] = training_vector[1]
+
+        perceptron.compute_output(input_data)
+        return perceptron.compute_error(output_data)
+
     def evaluate_solution(self, solution: Chromosome) -> float:
         error: float = 0.0
 
         self.apply_chromosome_to_perceptron(solution)
 
         for vector in self.dataset.evaluation_vectors:
-            input_data: [float] = vector[0]
-            output_data: [float] = vector[1]
-
-            self.perceptron.compute_output(input_data)
-            error += self.perceptron.compute_error(output_data)
+            error += self.compute_error((self.perceptron, vector))
 
         error = error / len(self.dataset.evaluation_vectors)
         return error
@@ -70,16 +80,10 @@ class PerceptronTrainingOptimizationProblem(IOptimizationProblem):
         # Apply chromosome genes to perceptron to compute error.
         self.apply_chromosome_to_perceptron(chromosome)
 
-        for vector in self.dataset.training_vectors:
-            input_data: [float] = vector[0]
-            output_data: [float] = vector[1]
-
-            self.perceptron.compute_output(input_data)
-            error += self.perceptron.compute_error(output_data)
-
-        error = error / len(self.dataset.training_vectors)
+        result = self.pool.map(self.compute_error, [(self.perceptron, v) for v in self.dataset.training_vectors], 50)
+        error = sum(result) / len(self.dataset.training_vectors)
+        
         # Negate the error because the algorithm maximizes the fitness, whereas we want to minimize the error.
-        # TODO: Maybe exponentiate the -error in order to bump up fitness values and promote slight variations.
         chromosome.fitness = -error
 
         # print(f'Computed fitness for a chromosome: {chromosome.fitness}')
