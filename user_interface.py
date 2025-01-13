@@ -5,6 +5,8 @@ GRID_SIZE = 32 # 32*32 square
 CELL_SIZE = 15  
 BRUSH_SIZE = 2  
 
+perceptron = Perceptron()
+
 def toggle_cell(event):
     # change color of cell
     x = event.x // CELL_SIZE
@@ -51,23 +53,73 @@ def get_8x8_matrix()->[int]:
 
     return reduced_matrix
 
+def apply_training_data_to_perceptron(perceptron: Perceptron, training_data: [float]):
+    weights: [[[float]]] = []
+    theta: [[float]] = []
+    data = training_data
+
+    neuron_count_per_layer = [perceptron.input_count] + perceptron.neurons_per_hidden_layer + [perceptron.output_count]
+    for idx in range(1, len(neuron_count_per_layer)):
+        curr_layer_neuron_count = neuron_count_per_layer[idx]
+        prev_layer_neuron_count = neuron_count_per_layer[idx-1]
+
+        layer_weights: [[float]] = []
+        for _ in range(0,curr_layer_neuron_count):
+            layer_weights.append(data[:prev_layer_neuron_count])
+            del data[:prev_layer_neuron_count]
+        
+        weights.append(layer_weights)
+
+    for idx in range(1, len(neuron_count_per_layer)):
+        curr_layer_neuron_count = neuron_count_per_layer[idx]
+        
+        layer_thresholds: [float] = data[:curr_layer_neuron_count]
+        del data[:curr_layer_neuron_count]
+        
+        theta.append(layer_thresholds)
+
+    perceptron.weights = weights
+    perceptron.theta = theta
+
+def perceptron_from_file(filename: str)-> Perceptron:
+    # Process training data from file
+    training_data_file = open(filename, "rt")
+    
+    # Read perceptron structure
+    header_str = training_data_file.readline()
+    header_data = [int(s) for s in header_str.split(',')]
+    input_count = header_data[0]
+    output_count = header_data[1]
+    hidden_layer_counts = header_data[2:]
+
+    # Read perceptron weights
+    weights_str = training_data_file.readline()
+    weights = [float(s) for s in weights_str.split(',')]
+
+    training_data_file.close()
+    perceptron = Perceptron.from_counts(input_count, output_count, len(hidden_layer_counts), hidden_layer_counts)
+    
+    apply_training_data_to_perceptron(perceptron, weights)
+
+    return perceptron
+
 
 def guess():
-    result = "N/A"
     #Todo: add logic here
     input_matrix = get_8x8_matrix()
-    for i in range(8):
-        for j in range(8):
-            print (input_matrix[i][j],end = " "),
-        print(" ")
-    print("---------------------")
     
     flat_input = [
         x
         for xs in input_matrix
         for x in xs
     ]
+    
+    normalized_input = [x/16 for x in flat_input]
+    perceptron.compute_output(normalized_input)
+    computed_output = perceptron.output_data
+    digit = computed_output.index(max(computed_output))
 
+    result = str(digit)
     result_window = tk.Toplevel(root)
     result_window.title("Rezultat")
     result_label = tk.Label(result_window, text=result, font=("Arial", 24),  padx=20, pady=20)
@@ -107,5 +159,7 @@ clear_button.pack(side=tk.LEFT, padx=5)
 
 guess_button = tk.Button(button_frame, text="Guess", command=guess, bg="lightgray", padx=10, pady=5)
 guess_button.pack(side=tk.LEFT, padx=5)
+
+perceptron = perceptron_from_file("training_output.txt")
 
 root.mainloop()
