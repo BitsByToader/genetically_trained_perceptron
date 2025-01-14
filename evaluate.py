@@ -56,6 +56,9 @@ if __name__ == '__main__':
     dataset = Dataset.from_file("handwriting_dataset.txt", 0)
 
     # Evaluation metrics
+    avg_correct_confidence = 0.0
+    avg_bad_confidence = 0.0
+    
     vectors_predicted_ok = 0
     vectors_predicted_not_ok = 0
     failed_class_histogram = [0] * output_count
@@ -71,8 +74,10 @@ if __name__ == '__main__':
         comp_class = comp_output.index(max(comp_output))
 
         if comp_class == expected_class:
+            avg_correct_confidence += max(comp_output)
             vectors_predicted_ok += 1
         else:
+            avg_bad_confidence += max(comp_output)
             vectors_predicted_not_ok += 1
             failed_class_histogram[expected_class] += 1
 
@@ -84,6 +89,13 @@ if __name__ == '__main__':
             # print(f'Computed class: {comp_class}')
             # print()
 
+    
     print(f'Vectors predicted right: {vectors_predicted_ok}')
+    print(f'Average confidence: {avg_correct_confidence / vectors_predicted_ok}')
+    print()
+
     print(f'Vectors predicted badly: {vectors_predicted_not_ok}')
+    print(f'Average confidence: {avg_bad_confidence / vectors_predicted_not_ok}')
+    print()
+
     print(f'Histogram of errors by correct classes: {failed_class_histogram}')
